@@ -6,9 +6,9 @@ dotenv.config({
 
 import { app } from "./app.js";
 
-app.listen(process.env.PORT, () => {
-  console.log(`app running on ${process.env.PORT}`);
-});
+// app.listen(process.env.PORT, () => {
+//   console.log(`app running on ${process.env.PORT}`);
+// });
 
 
 export default app;
