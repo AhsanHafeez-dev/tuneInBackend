@@ -13,11 +13,11 @@ import {
   generateAccessAndRefreshToken,
 } from "../utils/UserUtilities.js";
 import { sendRegistrationEmail } from "../utils/Notification.js";
-import { logger } from "../utils/logger.js";
+// import { logger } from "../utils/logger.js";
 import jwt from "jsonwebtoken";
 
 const registerUser = asyncHandler(async (req, res) => {
-  logger.info(`request from ${req.ip}`);
+  // logger.info(`request from ${req.ip}`);
 
   let { userName, fullName, email, password } = req.body;
   const conditions = [userName, fullName, password, email];
@@ -46,7 +46,7 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new ApiError(httpCodes.conflict, "User Already exists");
   }
 
-  logger.info("Registering ", email);
+  // logger.info("Registering ", email);
 
   const avatarBuffer = req.files?.avatar[0]?.buffer;
   let coverImageBuffer;
@@ -114,9 +114,9 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-  logger.info("login user called");
+  // logger.info("login user called");
   const { userName, email, password } = req.body;
-  logger.info(`${email} ${password}`);
+  // logger.info(`${email} ${password}`);
   if (!(userName || email)) {
     throw new ApiError(
       httpCodes.badRequest,
@@ -131,16 +131,16 @@ const loginUser = asyncHandler(async (req, res) => {
     where: { OR: [{ userName }, { email }] },
   });
   if(!user){throw new ApiError(httpCodes.notFound,"user doesnot exists")}
-  logger.info(`${(user?.password, password)}`);
+  // logger.info(`${(user?.password, password)}`);
   const passwordCoreect = await isPasswordCorrect(user.password, password);
   if (!passwordCoreect) {
     throw new ApiError(httpCodes.unauthorized, "Invalid credentials");
   }
-  logger.info("password checked");
+  // logger.info("password checked");
 
   const { accesssToken, refreshToken } =
     await generateAccessAndRefreshToken(user);
-  logger.info(accesssToken);
+  // logger.info(accesssToken);
 
   await prisma.user.update({ where: { id: user.id }, data: { refreshToken } });
 
@@ -159,7 +159,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
 
 const logoutUser = asyncHandler(async (req, res) => {
-  logger.info("starting to logout");
+  // logger.info("starting to logout");
   const user = req.user;
 
   await prisma.user.update({

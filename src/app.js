@@ -1,18 +1,18 @@
 import express from "express";
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import { logger } from "./utils/logger.js";
+// import { logger } from "./utils/logger.js";
 import morgan from "morgan";
 
 const app = express();
 
-const morganFormat = ":method :url :status :response-time ms";
-const morganStream = {
-  write: (message) => {
-    logger.info(message.trim());
-  },
-};
-app.use(morgan(morganFormat, { stream: morganStream }));
+// const morganFormat = ":method :url :status :response-time ms";
+// const morganStream = {
+//   write: (message) => {
+//     logger.info(message.trim());
+//   },
+// };
+// app.use(morgan(morganFormat, { stream: morganStream }));
 
 app.use(cookieParser());
 app.use(

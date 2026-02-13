@@ -30,3 +30,10 @@ if (!(s instanceof Array)) {
   s = [s];
   console.log(s);
 }
+
+// {
+//   "version": 2,
+//   "rewrites": [
+//     { "source": "/(.*)", "destination": "/api/index.js" }
+//   ]
+// }

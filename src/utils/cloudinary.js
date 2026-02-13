@@ -1,7 +1,7 @@
 import { v2 as cloudinary } from "cloudinary";
 
 import streamifier from "streamifier";
-import { logger } from "./logger.js";
+// import { logger } from "./logger.js";
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -27,7 +27,7 @@ const uploadOnCloudinary = async (fileBuffer) => {
 
     return await uploadPromise;
   } catch (err) {
-    logger.error(err);
+    // logger.error(err);
     return null;
   }
 };
@@ -37,7 +37,7 @@ const deleteFromCloudinary = async (publicId) => {
     await cloudinary.uploader.destroy(publicId);
     return true;
   } catch (error) {
-    logger.info(`Error while deleting resource with publicId ${publicId}`);
+    // logger.info(`Error while deleting resource with publicId ${publicId}`);
   }
 };
 
