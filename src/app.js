@@ -71,6 +71,7 @@ app.use("/api/v1/dashboard", dashboardRouter)
 app.get("/api/v1/error", (req, res) => {
   throw new ApiError(httpCodes.notImplemented, "fine");
 });
+app.get("/",(req,res)=>{res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok,{message:"everything is fine"},"hello"))})
 
 
 app.use(errorHandler);
