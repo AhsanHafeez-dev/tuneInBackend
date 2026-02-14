@@ -16,7 +16,7 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     // console.log(req);
     console.log("token : ", token);
     console.log("authorization", req.header("Authorization"));
-    console.log("headers ",req.header);
+    console.log("headers ",req.headers);
     
     
     
