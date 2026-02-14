@@ -1,5 +1,6 @@
 import { Router } from "express";
 import {
+  getCurrentUser,
   getUserChannelProfile,
   getWatchHistory,
   loginUser,
@@ -33,5 +34,5 @@ router
   .patch(verifyJWT, upload.single("coverImage"), updateUserCoverImage);
 router.route("/c/:userName").get(verifyJWT, getUserChannelProfile);
 router.route("/history").get(verifyJWT, getWatchHistory);
-
+router.route("/current-user").get(getCurrentUser)
 export default router;
