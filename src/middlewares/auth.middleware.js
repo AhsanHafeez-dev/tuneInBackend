@@ -10,7 +10,9 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
     // logger.info("starting auth middleware");
 
     const token =
-      req.cookies?.accessToken || req.header("Authorization")?.split(" ")[1];
+      req.cookies?.accessToken ||
+      req.header("Authorization")?.split(" ")[1] ||
+      req.cookies._vercel_jwt;
     console.log(req);
     
     if (!token) {
