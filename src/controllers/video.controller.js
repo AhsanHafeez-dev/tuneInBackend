@@ -34,13 +34,14 @@ const getAllVideos = asyncHandler(async (req, res) => {
         { title: { contains: query } },
         { description: { contains: query } },
         { owner: { userName } },
-        {owner:{fullName:userName}}
+        {owner:{fullName:req.user.fullName}}
       ],
       isPublished:true
     },
     skip: start,
     orderBy: sort,
     take: parseInt(limit),
+    include:{owner:true}
     
   });
   
