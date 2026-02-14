@@ -412,6 +412,30 @@ const getWatchHistory = asyncHandler(async (req, res) => {
 });
 
 
+const addVideoToWatchHistory = asyncHandler(async (req, res) => {
+  const { videoId } = req.body;
+
+  const video = await prisma.video.findUnique({ where: { id: videoId } });
+  if (!video) { throw new ApiError(httpCodes.notFound, "video with this id doesnot exists"); }
+  
+  const alreadyAdded = await prisma.watchHistory.findFirst({ where: { videoId } });
+  if(alreadyAdded){return res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok,{watched:alreadyAdded},"already added"))}
+  
+  const watched = await prisma.watchHistory.create({ data: { viewerId: req.user.id, videoId } });
+  return res.status(httpCodes.created).json(new ApiResponse(httpCodes.created, watched, "video added to watch History"));
+})
+
+
+const updateVideoWatchTime = asyncHandler(async (req, res) => {
+  const { videoId, watchTime = 5 } = req.body;
+
+  try { const updated = await prisma.watchHistory.update({ where: { videoId }, data: { watchedTill: { increment: watchTime } } }); }
+  catch (err) { throw new ApiError(httpCodes.badRequest, "video with this id doesnot exists or db is not working"); }
+  return res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok, {}, "suucessfully updated watch Time"));
+})
+
+
+
 export {
   registerUser,
   loginUser,
@@ -423,4 +447,6 @@ export {
   updateUserCoverImage,
   getUserChannelProfile,
   getWatchHistory,
+  addVideoToWatchHistory,
+  updateVideoWatchTime
 };
