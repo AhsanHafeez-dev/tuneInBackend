@@ -25,14 +25,16 @@ const getAllVideos = asyncHandler(async (req, res) => {
 
   sort[sortBy] = sortType;
   
-  console.log(query);
+  console.log(userName);
   
   const videos = await prisma.video.findMany({
     where: {
-      owner:{userName},
+      
       OR: [
         { title: { contains: query } },
         { description: { contains: query } },
+        { owner: { userName } },
+        {owner:{fullName:userName}}
       ],
       isPublished:true
     },
