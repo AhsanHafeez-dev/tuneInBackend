@@ -30,12 +30,12 @@ const getAllVideos = asyncHandler(async (req, res) => {
   const videos = await prisma.video.findMany({
     where: {
       
-      OR: [
-        { title: { contains: query } },
-        { description: { contains: query } },
-        { owner: { userName } },
-        {owner:{fullName:req.user.fullName}}
-      ],
+      // OR: [
+      //   { title: { contains: query } },
+      //   { description: { contains: query } },
+      //   { owner: { userName } },
+      //   {owner:{fullName:req.user.fullName}}
+      // ],
       isPublished:true
     },
     skip: start,
