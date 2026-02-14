@@ -29,9 +29,9 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     if (!commentId) { throw new ApiError(httpCodes.badRequest, "commentId is required for toggling like on it"); }
   let like;
   
-  try{ like = await prisma.like.delete({ where: { commentId } });}
+   like = await prisma.like.deleteMany({ where: { commentId } })
     
-    catch(err){
+    if(like.count===0){
         await prisma.like.create({ data: { commentId, ownerId: req.user.id } });
         return res.status(httpCodes.created).json(new ApiResponse(httpCodes.created, like, "like added successfully"));        
     }
@@ -44,10 +44,9 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     const { tweetId } = req.params;
     
     if (!tweetId) { throw new ApiError(httpCodes.badRequest, "tweetId is required for toggling like on it"); }
-  let like;  
-  try { like = await prisma.like.deleteMany({ where: { tweetId } }); }
+  let like = await prisma.like.deleteMany({ where: { tweetId } })
     
-    catch(err){
+    if(like.count===0){
         await prisma.like.create({ data: { tweetId, ownerId: req.user.id } });
         return res.status(httpCodes.created).json(new ApiResponse(httpCodes.created, like, "like added successfully"));        
     }
