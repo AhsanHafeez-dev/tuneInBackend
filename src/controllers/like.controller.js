@@ -8,11 +8,11 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
     const { videoId } = req.params;
    
   if (!videoId) { throw new ApiError(httpCodes.badRequest, "videoId is required for toggling like on it"); }
-  let like;
-  try  
-  { like = await prisma.like.delete({ where: { videoId } });}
+  
+  
+   let like = await prisma.like.deleteMany({ where: { videoId } });
     
-    catch(err) {
+    if(like.count===0) {
         await prisma.like.create({ data: { videoId, ownerId: req.user.id } });
         return res.status(httpCodes.created).json(new ApiResponse(httpCodes.created, like, "like added successfully"));        
     }
