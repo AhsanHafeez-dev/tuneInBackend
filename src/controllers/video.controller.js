@@ -122,7 +122,9 @@ const getVideoById = asyncHandler(async (req, res) => {
     );
   }
 
-  const video = await prisma.video.findUnique({ where: { id: videoId },include:{owner:true} });
+  const video = await prisma.video.findUnique({ where: { id: videoId }, include: { owner: { include: { subscribers: true } } } });
+  video.owner.subscribersCount = video.owner.subscribers.length;
+  video.owner.subscribers=undefined;
   if (!video) {
     throw new ApiError(httpCodes.notFound, "video with this Id doesnot exist");
   }
