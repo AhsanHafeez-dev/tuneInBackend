@@ -11,7 +11,8 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
 
     const token =
       req.cookies?.accessToken || req.header("Authorization")?.split(" ")[1];
-
+    console.log(req);
+    
     if (!token) {
       throw new ApiError(httpCodes.unauthorized, "please login first");
     }
