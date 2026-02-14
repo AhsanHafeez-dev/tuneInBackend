@@ -197,7 +197,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
     where: { ownerId: userId },
     include: { multimedia: true },
     orderBy: { createdAt: "desc" },
-    take: limit,
+    take: parseInt(limit),
     skip: skip,
   });
 

@@ -17,7 +17,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
   const comments = await prisma.comment.findMany({
     where: { videoId },
     skip: start,
-    take: limit,
+    take: parseInt(limit),
   });
   return res
     .status(httpCodes.ok)
