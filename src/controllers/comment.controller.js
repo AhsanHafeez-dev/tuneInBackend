@@ -18,6 +18,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
     where: { videoId },
     skip: start,
     take: parseInt(limit),
+    include:{owner:true}
   });
   return res
     .status(httpCodes.ok)
@@ -68,6 +69,7 @@ const updateComment = asyncHandler(async (req, res) => {
   const comment = await prisma.comment.update({
     where: { id: commentId },
     data: { content },
+    include:{owner:true}
   });}
   catch(err){
     throw new ApiError(httpCodes.notFound, "comment not found");
@@ -97,7 +99,7 @@ const getTweetComments = asyncHandler(async (req, res) => {
     throw new ApiError(httpCodes.badRequest, "tweetId is required");
   }
 
-  const comments = await prisma.comment.findMany({ where: { tweetId } });
+  const comments = await prisma.comment.findMany({ where: { tweetId },include:{owner:true} });
   if (comments === null || comments === undefined) {
     throw new ApiError(httpCodes.notFound, "cannot found tweet");
   }
@@ -116,7 +118,7 @@ const getCommentReplies = asyncHandler(async (req, res) => {
   }
 
   const comments = await prisma.comment.findMany({
-    where: { parentCommentId: commentId },
+    where: { parentCommentId: commentId },include:{owner:true}
   });
 
   if (comments === null || comments === undefined) {
@@ -144,6 +146,7 @@ const addCommentToTweet = asyncHandler(async (req, res) => {
       tweetId,
       ownerId: req.user.id,
     },
+    include:{owner:true}
   });
 
   if (!comment) {
