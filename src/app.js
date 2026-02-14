@@ -22,7 +22,7 @@ app.use(
       "https://tune-in-frontend.vercel.app/",
       "https://tune-in-frontend.vercel.app",
     ],
-    allowedHeaders: ["Authorization"],
+    allowedHeaders: ["Authorization","Content-Type"],
     credentials: true,
   })
 );
