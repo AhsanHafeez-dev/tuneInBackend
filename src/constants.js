@@ -16,6 +16,6 @@ const httpCodes = {
   serviceUnavailable: 503, // Server temporarily unavailable (overload or maintenance)
   gatewayTimeout: 504, // Upstream server failed to respond in time
 };
-const secureCookieOptions = { httpOnly: true, secure: true };
+const secureCookieOptions = { httpOnly: true, secure: true, sameSite: "None" };
 
 export { httpCodes, secureCookieOptions };
