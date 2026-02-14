@@ -10,7 +10,7 @@ const toggleVideoLike = asyncHandler(async (req, res) => {
   if (!videoId) { throw new ApiError(httpCodes.badRequest, "videoId is required for toggling like on it"); }
   
   
-   let like = await prisma.like.deleteMany({ where: { videoId } });
+   let like = await prisma.like.deleteMany({ where: { videoId,ownerId:req.user.id } });
     
     if(like.count===0) {
         await prisma.like.create({ data: { videoId, ownerId: req.user.id } });
@@ -29,7 +29,7 @@ const toggleCommentLike = asyncHandler(async (req, res) => {
     if (!commentId) { throw new ApiError(httpCodes.badRequest, "commentId is required for toggling like on it"); }
   let like;
   
-   like = await prisma.like.deleteMany({ where: { commentId } })
+   like = await prisma.like.deleteMany({ where: { commentId,ownerId:req.user.id } })
     
     if(like.count===0){
         await prisma.like.create({ data: { commentId, ownerId: req.user.id } });
@@ -44,7 +44,7 @@ const toggleTweetLike = asyncHandler(async (req, res) => {
     const { tweetId } = req.params;
     
     if (!tweetId) { throw new ApiError(httpCodes.badRequest, "tweetId is required for toggling like on it"); }
-  let like = await prisma.like.deleteMany({ where: { tweetId } })
+  let like = await prisma.like.deleteMany({ where: { tweetId ,ownerId:req.user.id} })
     
     if(like.count===0){
         await prisma.like.create({ data: { tweetId, ownerId: req.user.id } });
