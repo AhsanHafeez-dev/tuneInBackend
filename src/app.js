@@ -75,4 +75,4 @@ app.get("/",(req,res)=>{res.status(httpCodes.ok).json(new ApiResponse(httpCodes.
 
 
 app.use(errorHandler);
-export { app };
+export default app;
