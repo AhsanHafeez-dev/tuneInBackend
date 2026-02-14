@@ -10,10 +10,14 @@ import { httpCodes } from "../constants.js";
 
 
 const getAllVideos = asyncHandler(async (req, res) => {
-  let  { page = 0, limit = 10, query, sortBy, sortType, userName } = req.query;
+  let  { page = 1, limit = 10, query, sortBy, sortType, userName } = req.query;
   
   if (!(query && sortBy && sortType && userName)) {
-    throw new ApiError(httpCodes.badRequest, "required fields cannot be null");
+    // throw new ApiError(httpCodes.badRequest, "required fields cannot be null");
+    page = 1;
+    sortBy = "views";
+    sortType = "desc";
+    userName = req.user.userName;
   }
 
   const start = (page-1) * limit;
