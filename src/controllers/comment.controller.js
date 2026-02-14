@@ -8,12 +8,12 @@ const getVideoComments = asyncHandler(async (req, res) => {
   //TODO: get all comments for a video
 
   const { videoId } = req.params;
-  const { page = 0, limit = 10 } = req.query;
+  const { page = 1, limit = 10 } = req.query;
   if (!videoId) {
     throw new ApiError(httpCodes.badRequest, "videoId is required");
   }
 
-  const start = page * limit;
+  const start = (page-1) * limit;
   const comments = await prisma.comment.findMany({
     where: { videoId },
     skip: start,
