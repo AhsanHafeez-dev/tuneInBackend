@@ -122,21 +122,54 @@ const getVideoById = asyncHandler(async (req, res) => {
     );
   }
 
-  const video = await prisma.video.findUnique(
-    {
-      where: { id: videoId },
-      include: { owner: { include: { subscribers: true } } ,_count:{select:{likes:true}},likes:true}
-      
-    });
-  video.owner.subscribersCount = video.owner.subscribers.length;
-  video.isSubscribed = video.owner.subscribers.find((s) => s.subscriberId === req.user.id) != undefined;
-  video.owner.subscribers = undefined;
-  video.likesCount = video._count.likes;
-  video._count = undefined;
-  let isLiked = false;
-  video.likes.map((like) => { if (like.ownerId === req.user.id) isLiked = true; })
-  video.isLiked = isLiked;
+  let video;
+  const previouslyWatched = await prisma.watchHistory.findFirst({
+    where: { videoId },
+    include: {
+      video: {
+        include: {
+          owner: { include: { subscribers: true } },
+          _count: { select: { likes: true } },
+          likes:true
+        },
+      },
+    },
+  });
   
+  if (previouslyWatched)
+  {
+    video = previouslyWatched.video;
+    video.watchedTill = previouslyWatched.watchedTill;
+  }
+
+  else {
+    video = await prisma.video.findUnique({
+      where: { id: videoId },
+      include: {
+        owner: { include: { subscribers: true } },
+        _count: { select: { likes: true } },
+        likes: true,
+      },
+    });
+   
+  
+  }
+
+
+
+
+   video.owner.subscribersCount = video.owner.subscribers.length;
+   video.isSubscribed =
+     video.owner.subscribers.find((s) => s.subscriberId === req.user.id) !=
+     undefined;
+   video.owner.subscribers = undefined;
+   video.likesCount = video._count.likes;
+   video._count = undefined;
+   let isLiked = false;
+   video.likes.map((like) => {
+     if (like.ownerId === req.user.id) isLiked = true;
+   });
+   video.isLiked = isLiked;
   if (!video) {
     throw new ApiError(httpCodes.notFound, "video with this Id doesnot exist");
   }
