@@ -398,6 +398,7 @@ const getWatchHistory = asyncHandler(async (req, res) => {
     },
     watchedAt: historyItem.watchedAt,
     progress: historyItem.watchedTill,
+    createdAt:historyItem.video.createdAt
   }));
 
   return res
