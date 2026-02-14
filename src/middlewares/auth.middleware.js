@@ -13,8 +13,12 @@ export const verifyJWT = asyncHandler(async (req, res, next) => {
       req.cookies?.accessToken ||
       req.header("Authorization")?.split(" ")[1] ||
       req.cookies._vercel_jwt;
-    console.log(req);
-    console.log("token : ",token);
+    // console.log(req);
+    console.log("token : ", token);
+    console.log("authorization", req.header("Authorization"));
+    console.log("headers ",req.header);
+    
+    
     
     
     if (!token) {
