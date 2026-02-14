@@ -38,7 +38,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
     },
     skip: start,
     orderBy: sort,
-    take: limit,
+    take: parseInt(limit),
     
   });
   
