@@ -129,7 +129,7 @@ const getVideoById = asyncHandler(async (req, res) => {
       
     });
   video.owner.subscribersCount = video.owner.subscribers.length;
-  video.isSubscribed = video.owner.subscribers.find((s) => s.id === req.user.id) != undefined;
+  video.isSubscribed = video.owner.subscribers.find((s) => s.subscriberId === req.user.id) != undefined;
   video.owner.subscribers = undefined;
   video.likesCount = video._count.likes;
   video._count = undefined;
