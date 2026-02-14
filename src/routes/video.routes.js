@@ -11,12 +11,13 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
 const router = Router();
-router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
+// router.use(verifyJWT); // Apply verifyJWT middleware to all routes in this file
 
 router
   .route("/")
-  .get(getAllVideos)
+  .get(verifyJWT, getAllVideos)
   .post(
+    verifyJWT,
     upload.fields([
       {
         name: "videoFile",
