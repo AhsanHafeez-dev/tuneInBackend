@@ -18,7 +18,7 @@ const getVideoComments = asyncHandler(async (req, res) => {
     where: { videoId },
     skip: start,
     take: parseInt(limit),
-    include:{owner:true,replies:true}
+    include:{owner:true,replies:{include:{owner:true}}}
   });
   return res
     .status(httpCodes.ok)
