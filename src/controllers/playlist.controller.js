@@ -21,7 +21,7 @@ const createPlaylist = asyncHandler(async (req, res) => {
 
 const getUserPlaylists = asyncHandler(async (req, res) => {
   const { userId } = req.params;
-  const playlists = await prisma.playlist.findMany({ where: { ownerId: userId }, include: { videos: { include: { video: true } } } });
+  const playlists = await prisma.playlist.findMany({ where: { ownerId: userId }, include: { videos: { include: { video: {include:{owner:true}} } } } });
   res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok, playlists, "playlists fecthed successfully"));
   
   //TODO: get user playlists
