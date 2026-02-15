@@ -54,7 +54,7 @@ const getSubscribedChannels = asyncHandler(async (req, res) => {
 
   const subscribedTo = await prisma.subscription.findMany({
     where: { subscriberId: req.user.id },
-    include:{subscriber:{select:{userName:true,avatar:true,coverImage:true,id:true,fullName:true}}}
+    include:{channel:{select:{userName:true,avatar:true,coverImage:true,id:true,fullName:true}}}
   });
   
   return res
