@@ -160,7 +160,7 @@ const addCommentToTweet = asyncHandler(async (req, res) => {
 });
 
 const addCommentToComment = asyncHandler(async (req, res) => {
-  const { commentId } = req.paarams;
+  const { commentId } = req.params;
   const { content } = req.body;
   if (!(content && commentId)) {
     throw new ApiError(
