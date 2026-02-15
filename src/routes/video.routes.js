@@ -4,6 +4,7 @@ import {
   getAllVideos,
   getAllVideosOfUser,
   getVideoById,
+  getVideoSuggestions,
   publishAVideo,
   togglePublishStatus,
   updateVideo,
@@ -42,5 +43,5 @@ router
 
 router.route("/toggle/publish/:videoId").patch(togglePublishStatus);
 
-router.route("/suggested/:videoId").get();
+router.route("/suggested/:videoId").get(getVideoSuggestions);
 export default router;
