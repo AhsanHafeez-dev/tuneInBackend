@@ -279,6 +279,16 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
     .json(new ApiResponse(httpCodes.ok, video, "Toggled Successfully"));
 });
 
+const getAllVideosOfUser = asyncHandler(async (req, res) => {
+  const { userId } = req.params;
+
+  const videos = await prisma.video.findMany({ where: { ownerId: userId } });
+  
+  return res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok, videos, "videos of channel fetched successfully"));
+  
+});
+
+
 export {
   getAllVideos,
   publishAVideo,
@@ -286,4 +296,5 @@ export {
   updateVideo,
   deleteVideo,
   togglePublishStatus,
+  getAllVideosOfUser
 };

@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   deleteVideo,
   getAllVideos,
+  getAllVideosOfUser,
   getVideoById,
   publishAVideo,
   togglePublishStatus,
@@ -16,6 +17,7 @@ const router = Router();
 router
   .route("/")
   .get(verifyJWT, getAllVideos)
+
   .post(
     verifyJWT,
     upload.fields([
@@ -31,6 +33,7 @@ router
     publishAVideo
   );
 
+router.route("/:userId").get(getAllVideosOfUser)  
 router
   .route("/:videoId")
   .get(verifyJWT,getVideoById)
