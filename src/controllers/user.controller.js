@@ -341,10 +341,12 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
       coverImage: true,
       avatar: true,
       userName: true,
+      id:true,
       _count: { select: { subscribedChannels: true, subscribers: true } },
       subscribers: {
         where: { subscriberId: req.user?.id },
         select: { subscriberId: true },
+        
       },
     },
   });
