@@ -281,6 +281,7 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
 
 const getAllVideosOfUser = asyncHandler(async (req, res) => {
   const { userId } = req.params;
+  if(!userId || userId.trim()==="undefined"){throw new ApiError(httpCodes.badRequest,"userId is required and cannot  be null or undefined");}
 
   const videos = await prisma.video.findMany({ where: { ownerId: userId } });
   
