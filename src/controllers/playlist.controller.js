@@ -30,7 +30,7 @@ const getUserPlaylists = asyncHandler(async (req, res) => {
 const getPlaylistById = asyncHandler(async (req, res) => {
   const { playlistId } = req.params;
 
-  const playList = await prisma.playlist.findUnique({ where: { id: playlistId },include:{videos:true} });
+  const playList = await prisma.playlist.findUnique({ where: { id: playlistId }, include: { videos: { include: { video: { include: { owner: true } } } } } });
   if (!playList) { throw new ApiError(httpCodes.notFound, "playlist doesnot exists"); }
 
   return res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok, playList, "playlist fecthed successfully"));
