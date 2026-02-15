@@ -289,6 +289,15 @@ const getAllVideosOfUser = asyncHandler(async (req, res) => {
   
 });
 
+const getVideoSuggestions = asyncHandler(async (req, res) => {
+  const { videoId } = req.params;
+  const video = await prisma.video.findUnique({ where: { id: videoId } });
+  if (!video) { throw new ApiError(httpCodes.notFound, "video doesnot exists"); }
+
+  const suggestions=await prisma.video.findMany({ where: { ownerId: video.ownerId } });
+  return res.status(httpCodes.ok,suggestions,"suggestions fetched successfully")
+  
+})
 
 export {
   getAllVideos,
@@ -297,5 +306,6 @@ export {
   updateVideo,
   deleteVideo,
   togglePublishStatus,
-  getAllVideosOfUser
+  getAllVideosOfUser,
+  getVideoSuggestions
 };
