@@ -297,7 +297,7 @@ const getVideoSuggestions = asyncHandler(async (req, res) => {
   const suggestions = await prisma.video.findMany({ where: { ownerId: video.ownerId } });
   console.log("returning suggestions",suggestions);
   
-  return res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok,suggestions,"suggestions fetched successfully"))
+  return res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok, suggestions, "suggestions fetched successfully"));
   
 })
 
