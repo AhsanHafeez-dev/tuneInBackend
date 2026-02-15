@@ -35,7 +35,7 @@ router
 
 router.route("/:userId").get(getAllVideosOfUser)  
 router
-  .route("/:videoId")
+  .route("/c/:videoId")
   .get(verifyJWT,getVideoById)
   .delete(deleteVideo)
   .patch(upload.single("thumbnail"), updateVideo);
