@@ -49,6 +49,6 @@ router
 router.route("/toggle/publish/:videoId").patch(togglePublishStatus);
 
 router.route("/suggested/:videoId").get(getVideoSuggestions);
-router.route("/signature").get( getUploadSignature);
+
 
 export default router;

@@ -14,6 +14,7 @@ import {
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
+import { getUploadSignature } from "../controllers/video.controller.js";
 const router = Router();
 
 router.route("/register").post(
@@ -38,6 +39,7 @@ router.route("/c/:userName").get(verifyJWT, getUserChannelProfile);
 router.route("/history").get(verifyJWT, getWatchHistory).post(verifyJWT, addVideoToWatchHistory).patch(verifyJWT,updateVideoWatchTime);
 
 router.route("/current-user").get(verifyJWT, getCurrentUser);
+router.route("/signature").get(getUploadSignature);
 
 
 export default router;
