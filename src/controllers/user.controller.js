@@ -433,7 +433,7 @@ const addVideoToWatchHistory = asyncHandler(async (req, res) => {
 const updateVideoWatchTime = asyncHandler(async (req, res) => {
   const { videoId, watchTime = 5 } = req.body;
 
-  try { const updated = await prisma.watchHistory.updateMany({ where: { videoId }, data: { watchedTill: watchTime } }); }
+  try { const updated = await prisma.watchHistory.updateMany({ where: { videoId,viewerId:req.user.id }, data: { watchedTill: watchTime } }); }
   catch (err) { throw new ApiError(httpCodes.badRequest, "video with this id doesnot exists or db is not working"); }
   return res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok, {}, "suucessfully updated watch Time"));
 })
