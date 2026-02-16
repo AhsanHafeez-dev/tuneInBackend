@@ -107,7 +107,7 @@ const getTweetComments = asyncHandler(async (req, res) => {
     throw new ApiError(httpCodes.badRequest, "tweetId is required");
   }
 
-  const comments = await prisma.comment.findMany({ where: { tweetId },include:{owner:true} });
+  const comments = await prisma.comment.findMany({ where: { tweetId },include:{owner:true,replies:{include:{owner:true}}} });
   if (comments === null || comments === undefined) {
     throw new ApiError(httpCodes.notFound, "cannot found tweet");
   }
