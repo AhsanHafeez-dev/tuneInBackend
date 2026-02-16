@@ -421,7 +421,7 @@ const addVideoToWatchHistory = asyncHandler(async (req, res) => {
   const video = await prisma.video.findUnique({ where: { id: videoId } });
   if (!video) { throw new ApiError(httpCodes.notFound, "video with this id doesnot exists"); }
   
-  const alreadyAdded = await prisma.watchHistory.findFirst({ where: { videoId } });
+  const alreadyAdded = await prisma.watchHistory.findFirst({ where: { videoId,viewerId:req.user?.id } });
   if(alreadyAdded){return res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok,{watched:alreadyAdded},"already added"))}
   
   await prisma.video.update({ where: { id: videoId }, data: { views: { increment:1 } } });
