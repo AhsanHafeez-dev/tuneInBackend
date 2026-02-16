@@ -14,12 +14,17 @@ const getVideoComments = asyncHandler(async (req, res) => {
   }
 
   const start = (page-1) * limit;
-  const comments = await prisma.comment.findMany({
+  let comments = await prisma.comment.findMany({
     where: { videoId },
     skip: start,
     take: parseInt(limit),
-    include:{owner:true,replies:{include:{owner:true}}}
+    include:{likes:true,owner:true,replies:{include:{owner:true,likes:{include:{owner:true}}}}}
   });
+  comment = comments.map((comment) => {
+    comment.isLiked = comment.likes.find((like) => like.ownerId === req.user.id);
+    comment.replies.map((comment) => { comment.isLiked = comment.likes.find((like) => like.ownerId === req.user.id); return comment });
+    return comment;
+  })
   return res
     .status(httpCodes.ok)
     .json(
