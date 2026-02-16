@@ -5,6 +5,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { prisma } from "../../prisma/index.js";
 import {
   deleteFromCloudinary,
+  generateSignature,
   uploadOnCloudinary,
 } from "../utils/cloudinary.js";
 import {
@@ -259,28 +260,42 @@ const getCurrentUser = asyncHandler((req, res) => {
 });
 
 
-
 const updateUserAvatar = asyncHandler(async (req, res) => {
+  const { avatarUrl, avatarPublicId } = req.body;
   const avatarBuffer = req.file?.buffer;
-  if (!avatarBuffer) {
-    throw new ApiError(httpCodes.badRequest, "Avatar is required");
+
+  if (!avatarBuffer && !avatarUrl) {
+    throw new ApiError(
+      httpCodes.badRequest,
+      "Avatar is required (file or URL)"
+    );
   }
   let user = req.user;
 
-  const avatar = await uploadOnCloudinary(avatarBuffer);
-  if (!avatar?.secure_url) {
-    throw new ApiError("Error Uploading to cloud");
+  let finalAvatarUrl = avatarUrl;
+  let finalAvatarPublicId = avatarPublicId;
+
+  if (avatarBuffer) {
+    const avatar = await uploadOnCloudinary(avatarBuffer);
+    if (!avatar?.secure_url) {
+      throw new ApiError("Error Uploading to cloud");
+    }
+    finalAvatarUrl = avatar.secure_url;
+    finalAvatarPublicId = avatar.public_id;
   }
-  console.log(avatar);
-  console.log(avatar+"");
-  
+
   const publicId = user.avatarPublicId;
   user = await prisma.user.update({
     where: { id: user.id },
-    data: { avatar: avatar.secure_url, avatarPublicId: avatar.public_id },
+    data: { avatar: finalAvatarUrl, avatarPublicId: finalAvatarPublicId },
   });
 
-  await deleteFromCloudinary(publicId);
+  if (publicId && publicId !== finalAvatarPublicId) {
+    // Don't await this, let it happen in background
+    deleteFromCloudinary(publicId).catch((err) =>
+      console.error("Failed to delete old avatar", err)
+    );
+  }
 
   user.password = user.authUrl = user.otp = undefined;
   res
@@ -290,29 +305,49 @@ const updateUserAvatar = asyncHandler(async (req, res) => {
     );
 });
 
-
-
 const updateUserCoverImage = asyncHandler(async (req, res) => {
+  const { coverImageUrl, coverImagePublicId } = req.body;
   const coverImageBuffer = req.file?.buffer;
-  if (!coverImageBuffer) {
-    throw new ApiError(httpCodes.badRequest, "coverImage is required");
+
+  if (!coverImageBuffer && !coverImageUrl) {
+    throw new ApiError(
+      httpCodes.badRequest,
+      "coverImage is required (file or URL)"
+    );
   }
   let user = req.user;
 
-  const coverImage = await uploadOnCloudinary(coverImageBuffer);
-  if (!coverImage) {
-    throw new ApiError("Error Uploading to cloud");
+  let finalCoverUrl = coverImageUrl;
+  let finalCoverPublicId = coverImagePublicId;
+
+  if (coverImageBuffer) {
+    const coverImage = await uploadOnCloudinary(coverImageBuffer);
+    if (!coverImage) {
+      throw new ApiError("Error Uploading to cloud");
+    }
+    finalCoverUrl = coverImage.secure_url;
+    finalCoverPublicId = coverImage.public_id;
   }
-  const needDeletion = user.coverImage.trim() != "";
+
+  const oldCoverPublicId = user.coverImagePublicId;
+  const needDeletion = user.coverImage && user.coverImage.trim() !== "";
+
   user = await prisma.user.update({
     where: { id: user.id },
     data: {
-      coverImage: coverImage.secure_url,
-      coverImagePublicId: coverImage.public_id,
+      coverImage: finalCoverUrl,
+      coverImagePublicId: finalCoverPublicId,
     },
   });
-  if (needDeletion) {
-    await deleteFromCloudinary(user.coverImagePublicId);
+
+  if (
+    needDeletion &&
+    oldCoverPublicId &&
+    oldCoverPublicId !== finalCoverPublicId
+  ) {
+    deleteFromCloudinary(oldCoverPublicId).catch((err) =>
+      console.error("Failed to delete old cover", err)
+    );
   }
 
   user.password = user.authUrl = user.otp = undefined;
@@ -326,6 +361,7 @@ const updateUserCoverImage = asyncHandler(async (req, res) => {
       )
     );
 });
+
 
 
 
@@ -365,6 +401,8 @@ const getUserChannelProfile = asyncHandler(async (req, res) => {
       new ApiResponse(httpCodes.ok, channel, "channe; fetched successfull")
     );
 });
+
+
 
 
 
@@ -440,6 +478,16 @@ const updateVideoWatchTime = asyncHandler(async (req, res) => {
 
 
 
+
+const getPublicUploadSignature = asyncHandler(async (req, res) => {
+  // TODO: Add rate limiting here if needed in future
+  
+  const signatureData = generateSignature();
+  res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok, signatureData, "Public signature generated"));
+});
+
+
+
 export {
   registerUser,
   loginUser,
@@ -452,5 +500,6 @@ export {
   getUserChannelProfile,
   getWatchHistory,
   addVideoToWatchHistory,
-  updateVideoWatchTime
+  updateVideoWatchTime,
+  getPublicUploadSignature
 };

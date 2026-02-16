@@ -25,11 +25,11 @@
 
 // rawUser.watchHistory = formattedWatchHistory;
 
-let s = "abc";
-if (!(s instanceof Array)) {
-  s = [s];
-  console.log(s);
-}
+// let s = "abc";
+// if (!(s instanceof Array)) {
+//   s = [s];
+//   console.log(s);
+// }
 
 // {
 //   "version": 2,
@@ -37,3 +37,14 @@ if (!(s instanceof Array)) {
 //     { "source": "/(.*)", "destination": "/api/index.js" }
 //   ]
 // }
+
+const seconds = [55,
+  (21 * 60) + 52
+];
+
+seconds.map((sec) => {
+  console.log("converting ", sec);
+  console.log(`Hours : ${Math.floor(sec/(60*60))}   minutes :${   Math.floor(  ((sec)%(60*60))/60   )  }  Seconds  ${sec %60} `);
+  
+  
+})
