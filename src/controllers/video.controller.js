@@ -286,6 +286,7 @@ const getVideoById = asyncHandler(async (req, res) => {
   //TODO: get video by id
 });
 
+
 const updateVideo = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   const { title, description } = req.body;
@@ -334,6 +335,8 @@ const updateVideo = asyncHandler(async (req, res) => {
   //TODO: update video details like title, description, thumbnail
 });
 
+
+
 const deleteVideo = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
 
@@ -361,6 +364,8 @@ const deleteVideo = asyncHandler(async (req, res) => {
   //TODO: delete video
 });
 
+
+
 const togglePublishStatus = asyncHandler(async (req, res) => {
   const { videoId } = req.params;
   if (!videoId) {
@@ -385,6 +390,8 @@ const togglePublishStatus = asyncHandler(async (req, res) => {
     .json(new ApiResponse(httpCodes.ok, video, "Toggled Successfully"));
 });
 
+
+
 const getAllVideosOfUser = asyncHandler(async (req, res) => {
   const { userId } = req.params;
   if(!userId || userId.trim()==="undefined"){throw new ApiError(httpCodes.badRequest,"userId is required and cannot  be null or undefined");}
@@ -394,6 +401,8 @@ const getAllVideosOfUser = asyncHandler(async (req, res) => {
   return res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok, videos, "videos of channel fetched successfully"));
   
 });
+
+
 
 const getVideoSuggestions = asyncHandler(async (req, res) => {
   
