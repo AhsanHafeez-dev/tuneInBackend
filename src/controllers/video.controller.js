@@ -329,5 +329,6 @@ export {
   deleteVideo,
   togglePublishStatus,
   getAllVideosOfUser,
-  getVideoSuggestions
+  getVideoSuggestions,
+  searchQuery
 };

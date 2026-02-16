@@ -6,6 +6,7 @@ import {
   getVideoById,
   getVideoSuggestions,
   publishAVideo,
+  searchQuery,
   togglePublishStatus,
   updateVideo,
 } from "../controllers/video.controller.js";
@@ -34,7 +35,7 @@ router
     publishAVideo
   );
 
-router.route("/search").get() 
+router.route("/search").get(searchQuery) 
 router.route("/:userId").get(getAllVideosOfUser)  
 router
   .route("/c/:videoId")
