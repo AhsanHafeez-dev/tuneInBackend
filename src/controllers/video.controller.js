@@ -49,16 +49,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
   console.log(userName);
   
   const videos = await prisma.video.findMany({
-    where: {
-      
-      // OR: [
-      //   { title: { contains: query } },
-      //   { description: { contains: query } },
-      //   { owner: { userName } },
-      //   {owner:{fullName:req.user.fullName}}
-      // ],
-      isPublished:true
-    },
+    where: {isPublished:true},
     skip: start,
     orderBy: sort,
     take: parseInt(limit),
@@ -406,11 +397,18 @@ const getAllVideosOfUser = asyncHandler(async (req, res) => {
 
 const getVideoSuggestions = asyncHandler(async (req, res) => {
   
-  const { videoId } = req.params;
-  const video = await prisma.video.findUnique({ where: { id: videoId } });
+  const { videoId,limit=10 } = req.params;
+  
+  const video = await prisma.video.findUnique({ where: { id: videoId, isPublished: true } });
+  
   if (!video) { throw new ApiError(httpCodes.notFound, "video doesnot exists"); }
 
-  const suggestions = await prisma.video.findMany({ where: { ownerId: video.ownerId ,isPublished:true} });
+  let suggestions = await prisma.video.findMany({ where: { ownerId: video.ownerId, isPublished: true } });
+  if (!(suggestions.length > limit)) {
+    await prisma.video.findMany(
+      { where: { isPublished: true, ownerId: { notIn: [req.user.id] } }, take: limit - (suggestions.length + 1),orderBy:{createdAt:"desc"} });
+  }
+  
   console.log("returning suggestions", suggestions);
   return res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok, suggestions, "suggestions fetched successfully"));
   
