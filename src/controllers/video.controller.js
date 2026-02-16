@@ -405,8 +405,10 @@ const getVideoSuggestions = asyncHandler(async (req, res) => {
 
   let suggestions = await prisma.video.findMany({ where: { ownerId: video.ownerId, isPublished: true } });
   if (!(suggestions.length > limit)) {
-    await prisma.video.findMany(
-      { where: { isPublished: true, ownerId: { notIn: [req.user.id] } }, take: limit - (suggestions.length + 1),orderBy:{createdAt:"desc"} });
+
+    let abc=await prisma.video.findMany(
+      { where: { isPublished: true, ownerId: { notIn: [req.user.id] } }, take: limit - (suggestions.length + 1), orderBy: { createdAt: "desc" } });
+    suggestions = [...suggestions, ...abc];
   }
   
   console.log("returning suggestions", suggestions);
