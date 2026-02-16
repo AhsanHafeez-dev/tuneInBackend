@@ -195,7 +195,7 @@ const getUserTweets = asyncHandler(async (req, res) => {
 
   const tweets = await prisma.tweet.findMany({
     where: { ownerId: userId },
-    include: { multimedia: true },
+    include: { multimedia: true,owner:true },
     orderBy: { createdAt: "desc" },
     take: parseInt(limit),  
     skip: skip,
