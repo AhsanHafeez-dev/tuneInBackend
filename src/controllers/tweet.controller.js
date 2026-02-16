@@ -193,12 +193,17 @@ const getUserTweets = asyncHandler(async (req, res) => {
   
   const skip = (page - 1) * limit;
 
-  const tweets = await prisma.tweet.findMany({
+  let tweets = await prisma.tweet.findMany({
     where: { ownerId: userId },
-    include: { multimedia: true,owner:true },
+    include: { multimedia: true,owner:true,likes:true,comments:{include:{owner:true}} },
     orderBy: { createdAt: "desc" },
     take: parseInt(limit),  
     skip: skip,
+  });
+  tweets = tweets.map((tweet) => {
+    tweet.isLiked = tweet.likes.find((like) => like.ownerId === req.user.id) !== undefined;
+    tweet.comments = tweet.comments.map((comment) => { comment.isLiked = comment.likes.find((like) => like.ownerId === req.user.id); return comment });
+    return tweet
   });
 
   return res

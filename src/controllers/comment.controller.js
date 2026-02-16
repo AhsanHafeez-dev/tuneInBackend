@@ -13,16 +13,19 @@ const getVideoComments = asyncHandler(async (req, res) => {
     throw new ApiError(httpCodes.badRequest, "videoId is required");
   }
 
-  const start = (page-1) * limit;
+  const start = (page - 1) * limit;
+  
   let comments = await prisma.comment.findMany({
     where: { videoId },
     skip: start,
     take: parseInt(limit),
     include:{likes:true,owner:true,replies:{include:{owner:true,likes:{include:{owner:true}}}}}
   });
-  comment = comments.map((comment) => {
+  
+  comments = comments.map((comment) => {
+    
     comment.isLiked = comment.likes.find((like) => like.ownerId === req.user.id);
-    comment.replies.map((comment) => { comment.isLiked = comment.likes.find((like) => like.ownerId === req.user.id); return comment });
+    comment.replies =comment.replies.map((comment) => { comment.isLiked = comment.likes.find((like) => like.ownerId === req.user.id); return comment });
     return comment;
   })
   return res
