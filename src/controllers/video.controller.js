@@ -27,50 +27,53 @@ const searchQuery = asyncHandler(async (req, res) => {
 
 });
 
-// const getAllVideos = asyncHandler(async (req, res) => {
-//   let  { page = 1, limit = 10, query, sortBy, sortType, userName } = req.query;
-  
-//   if (!(query && sortBy && sortType && userName)) {
-//     // throw new ApiError(httpCodes.badRequest, "required fields cannot be null");
-//     page = 1;
-//     sortBy = "views";
-//     sortType = "desc";
-//     userName = req.user.userName;
-//   }
 
-//   const start = (page-1) * limit;
-//   let sort = {};
 
-//   sort[sortBy] = sortType;
+
+const getAllVideos = asyncHandler(async (req, res) => {
+  let  { page = 1, limit = 10, query, sortBy, sortType, userName } = req.query;
   
-//   console.log(userName);
+  if (!(query && sortBy && sortType && userName)) {
+    // throw new ApiError(httpCodes.badRequest, "required fields cannot be null");
+    page = 1;
+    sortBy = "views";
+    sortType = "desc";
+    userName = req.user.userName;
+  }
+
+  const start = (page-1) * limit;
+  let sort = {};
+
+  sort[sortBy] = sortType;
   
-//   const videos = await prisma.video.findMany({
-//     where: {
+  console.log(userName);
+  
+  const videos = await prisma.video.findMany({
+    where: {
       
-//       // OR: [
-//       //   { title: { contains: query } },
-//       //   { description: { contains: query } },
-//       //   { owner: { userName } },
-//       //   {owner:{fullName:req.user.fullName}}
-//       // ],
-//       isPublished:true
-//     },
-//     skip: start,
-//     orderBy: sort,
-//     take: parseInt(limit),
-//     include:{owner:true}
+      // OR: [
+      //   { title: { contains: query } },
+      //   { description: { contains: query } },
+      //   { owner: { userName } },
+      //   {owner:{fullName:req.user.fullName}}
+      // ],
+      isPublished:true
+    },
+    skip: start,
+    orderBy: sort,
+    take: parseInt(limit),
+    include:{owner:true}
     
-//   });
+  });
   
-//   res
-//     .status(httpCodes.ok)
-//     .json(
-//       new ApiResponse(httpCodes.ok, videos, "all videos fectched successfully")
-//     );
+  res
+    .status(httpCodes.ok)
+    .json(
+      new ApiResponse(httpCodes.ok, videos, "all videos fectched successfully")
+    );
 
-//   //TODO: get all videos based on query, sort, pagination
-// });
+  //TODO: get all videos based on query, sort, pagination
+});
 
 
 // const publishAVideo = asyncHandler(async (req, res) => {
