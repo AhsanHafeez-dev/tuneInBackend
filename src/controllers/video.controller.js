@@ -36,7 +36,7 @@ const getAllVideos = asyncHandler(async (req, res) => {
   if (!(query && sortBy && sortType && userName)) {
     // throw new ApiError(httpCodes.badRequest, "required fields cannot be null");
     page = 1;
-    sortBy = "views";
+    sortBy = "createdAt";
     sortType = "desc";
     userName = req.user.userName;
   }
