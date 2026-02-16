@@ -9,6 +9,23 @@ import {
 import { httpCodes } from "../constants.js";
 
 
+
+const searchQuery = asyncHandler(async (req, res) => {
+
+  let { limit = 10, query } = req.query;
+  const videos=await prisma.video.findMany({
+    where: {
+      OR: [
+        { description: { contains: query,mode:"insensitive" } },
+        { title: { contains: query,mode:"insensitive" } }
+        
+      ]
+    }
+  });
+  return res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok,videos,"suggestion fetched"))
+
+});
+
 const getAllVideos = asyncHandler(async (req, res) => {
   let  { page = 1, limit = 10, query, sortBy, sortType, userName } = req.query;
   

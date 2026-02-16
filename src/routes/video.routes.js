@@ -34,6 +34,7 @@ router
     publishAVideo
   );
 
+router.route("/search").get() 
 router.route("/:userId").get(getAllVideosOfUser)  
 router
   .route("/c/:videoId")
