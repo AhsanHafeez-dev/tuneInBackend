@@ -40,5 +40,13 @@ const deleteFromCloudinary = async (publicId) => {
     // logger.info(`Error while deleting resource with publicId ${publicId}`);
   }
 };
+const generateSignature = () => {
+  const timestamp = Math.round(new Date().getTime() / 1000);
+  const signature = cloudinary.utils.api_sign_request(
+    { timestamp },
+    process.env.CLOUDINARY_API_SECRET
+  );
 
-export { uploadOnCloudinary, deleteFromCloudinary };
+  return { timestamp, signature, api_key: process.env.CLOUDINARY_API_KEY, cloud_name: process.env.CLOUDINARY_CLOUD_NAME };
+}
+export { uploadOnCloudinary, deleteFromCloudinary ,generateSignature};

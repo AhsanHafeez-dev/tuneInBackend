@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import {
   deleteFromCloudinary,
+  generateSignature,
   uploadOnCloudinary,
 } from "../utils/cloudinary.js";
 import { httpCodes } from "../constants.js";
@@ -26,80 +27,165 @@ const searchQuery = asyncHandler(async (req, res) => {
 
 });
 
-const getAllVideos = asyncHandler(async (req, res) => {
-  let  { page = 1, limit = 10, query, sortBy, sortType, userName } = req.query;
+// const getAllVideos = asyncHandler(async (req, res) => {
+//   let  { page = 1, limit = 10, query, sortBy, sortType, userName } = req.query;
   
-  if (!(query && sortBy && sortType && userName)) {
-    // throw new ApiError(httpCodes.badRequest, "required fields cannot be null");
-    page = 1;
-    sortBy = "views";
-    sortType = "desc";
-    userName = req.user.userName;
-  }
+//   if (!(query && sortBy && sortType && userName)) {
+//     // throw new ApiError(httpCodes.badRequest, "required fields cannot be null");
+//     page = 1;
+//     sortBy = "views";
+//     sortType = "desc";
+//     userName = req.user.userName;
+//   }
 
-  const start = (page-1) * limit;
-  let sort = {};
+//   const start = (page-1) * limit;
+//   let sort = {};
 
-  sort[sortBy] = sortType;
+//   sort[sortBy] = sortType;
   
-  console.log(userName);
+//   console.log(userName);
   
-  const videos = await prisma.video.findMany({
-    where: {
+//   const videos = await prisma.video.findMany({
+//     where: {
       
-      // OR: [
-      //   { title: { contains: query } },
-      //   { description: { contains: query } },
-      //   { owner: { userName } },
-      //   {owner:{fullName:req.user.fullName}}
-      // ],
-      isPublished:true
-    },
-    skip: start,
-    orderBy: sort,
-    take: parseInt(limit),
-    include:{owner:true}
+//       // OR: [
+//       //   { title: { contains: query } },
+//       //   { description: { contains: query } },
+//       //   { owner: { userName } },
+//       //   {owner:{fullName:req.user.fullName}}
+//       // ],
+//       isPublished:true
+//     },
+//     skip: start,
+//     orderBy: sort,
+//     take: parseInt(limit),
+//     include:{owner:true}
     
-  });
+//   });
   
-  res
-    .status(httpCodes.ok)
-    .json(
-      new ApiResponse(httpCodes.ok, videos, "all videos fectched successfully")
-    );
+//   res
+//     .status(httpCodes.ok)
+//     .json(
+//       new ApiResponse(httpCodes.ok, videos, "all videos fectched successfully")
+//     );
 
-  //TODO: get all videos based on query, sort, pagination
-});
+//   //TODO: get all videos based on query, sort, pagination
+// });
+
+
+// const publishAVideo = asyncHandler(async (req, res) => {
+//   const { title, description } = req.body;
+//   console.log(req.files);
+  
+//   if (!(title.trim() && description.trim())) {
+//     throw new ApiError(
+//       httpCodes.badRequest,
+//       "title and description are required for saving video"
+//     );
+//   }
+
+//   const videoBuffer = req.files.videoFile[0].buffer;
+//   const thumbnailBuffer = req.files.thumbnail[0].buffer;
+
+//   if (!(videoBuffer && thumbnailBuffer)) {
+//     throw new ApiError(
+//       httpCodes.badRequest,
+//       "video and thumbnail are required for uploading video"
+//     );
+//   }
+
+//   const video = await uploadOnCloudinary(videoBuffer);
+//   const thumbnail = await uploadOnCloudinary(thumbnailBuffer);
+
+//   if (!(video && thumbnail)) {
+//     throw new ApiError(
+//       httpCodes.serverSideError,
+//       "Error while uploading video/thumbnail to cloud"
+//     );
+//   }
+
+//   const createdvideo = await prisma.video.create({
+//     data: {
+//       title,
+//       description,
+//       thumbnail: thumbnail.secure_url,
+//       videoFile: video.secure_url,
+//       thumbnailPublicId: thumbnail.public_id,
+//       videoPublicId: video.public_id,
+//       ownerId: req.user.id,
+//       duration: video.duration || 0,
+//     },
+//   });
+
+//   createdvideo.videoPublicId = createdvideo.thumbnailPublicId = undefined;
+//   res
+//     .status(httpCodes.created)
+//     .json(
+//       new ApiResponse(
+//         httpCodes.created,
+//         createdvideo,
+//         "video uploaded succcessfully"
+//       )
+//     );
+//   // TODO: get video, upload to cloudinary, create video
+// });
+
+
+
+
+
 
 
 const publishAVideo = asyncHandler(async (req, res) => {
-  const { title, description } = req.body;
-  console.log(req.files);
-  
-  if (!(title.trim() && description.trim())) {
+  const {
+    title,
+    description,
+    videoUrl,
+    thumbnailUrl,
+    videoPublicId,
+    thumbnailPublicId,
+    duration,
+  } = req.body;
+
+  if (!(title?.trim() && description?.trim())) {
     throw new ApiError(
       httpCodes.badRequest,
       "title and description are required for saving video"
     );
   }
 
-  const videoBuffer = req.files.videoFile[0].buffer;
-  const thumbnailBuffer = req.files.thumbnail[0].buffer;
+  let finalVideoUrl = videoUrl;
+  let finalThumbnailUrl = thumbnailUrl;
+  let finalVideoPublicId = videoPublicId;
+  let finalThumbnailPublicId = thumbnailPublicId;
+  let finalDuration = duration ? parseFloat(duration) : 0;
 
-  if (!(videoBuffer && thumbnailBuffer)) {
-    throw new ApiError(
-      httpCodes.badRequest,
-      "video and thumbnail are required for uploading video"
-    );
+  // Fallback to server-side upload if files are present
+  if (req.files?.videoFile && req.files?.thumbnail) {
+    const videoBuffer = req.files.videoFile[0].buffer;
+    const thumbnailBuffer = req.files.thumbnail[0].buffer;
+
+    const video = await uploadOnCloudinary(videoBuffer);
+    const thumbnail = await uploadOnCloudinary(thumbnailBuffer);
+
+    if (!(video && thumbnail)) {
+      throw new ApiError(
+        httpCodes.serverSideError,
+        "Error while uploading video/thumbnail to cloud"
+      );
+    }
+
+    finalVideoUrl = video.secure_url;
+    finalThumbnailUrl = thumbnail.secure_url;
+    finalVideoPublicId = video.public_id;
+    finalThumbnailPublicId = thumbnail.public_id;
+    finalDuration = video.duration || 0;
   }
 
-  const video = await uploadOnCloudinary(videoBuffer);
-  const thumbnail = await uploadOnCloudinary(thumbnailBuffer);
-
-  if (!(video && thumbnail)) {
+  if (!(finalVideoUrl && finalThumbnailUrl)) {
     throw new ApiError(
-      httpCodes.serverSideError,
-      "Error while uploading video/thumbnail to cloud"
+      httpCodes.badRequest,
+      "video and thumbnail are required (either as URLs or files)"
     );
   }
 
@@ -107,16 +193,15 @@ const publishAVideo = asyncHandler(async (req, res) => {
     data: {
       title,
       description,
-      thumbnail: thumbnail.secure_url,
-      videoFile: video.secure_url,
-      thumbnailPublicId: thumbnail.public_id,
-      videoPublicId: video.public_id,
+      thumbnail: finalThumbnailUrl,
+      videoFile: finalVideoUrl,
+      thumbnailPublicId: finalThumbnailPublicId || "unknown",
+      videoPublicId: finalVideoPublicId || "unknown",
       ownerId: req.user.id,
-      duration: video.duration || 0,
+      duration: finalDuration,
     },
   });
 
-  createdvideo.videoPublicId = createdvideo.thumbnailPublicId = undefined;
   res
     .status(httpCodes.created)
     .json(
@@ -126,8 +211,9 @@ const publishAVideo = asyncHandler(async (req, res) => {
         "video uploaded succcessfully"
       )
     );
-  // TODO: get video, upload to cloudinary, create video
 });
+
+
 
 
 const getVideoById = asyncHandler(async (req, res) => {
@@ -321,6 +407,15 @@ const getVideoSuggestions = asyncHandler(async (req, res) => {
   
 })
 
+
+
+const getUploadSignature = asyncHandler(async (req, res) => {
+  const signatureData = generateSignature();
+  
+  res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok, signatureData, "Signature generated successfully"));
+});
+
+
 export {
   getAllVideos,
   publishAVideo,
@@ -330,5 +425,6 @@ export {
   togglePublishStatus,
   getAllVideosOfUser,
   getVideoSuggestions,
-  searchQuery
+  searchQuery,
+  getUploadSignature
 };
