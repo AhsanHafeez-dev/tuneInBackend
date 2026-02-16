@@ -428,19 +428,7 @@ const getUploadSignature = asyncHandler(async (req, res) => {
 });
 
 
-const deleteVideoById = asyncHandler(async (req, res) => {
-  const { videoId } = req.params;
-  
-  if (!videoId || videoId.trim() === "undefined") { throw new ApiError(httpCodes.badRequest, "videoId cannot be null,undefined or empty"); }
 
-  try {
-    await prisma.video.delete({ where: { id: videoId } });
-  }
-  catch (err) { throw new ApiError(httpCodes.notFound, err.message || "video not found"); }
-
-  return res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok, {}, "video deleted successfully"));
-
-})
 export {
   getAllVideos,
   publishAVideo,
@@ -451,5 +439,6 @@ export {
   getAllVideosOfUser,
   getVideoSuggestions,
   searchQuery,
-  getUploadSignature
+  getUploadSignature,
+
 };
