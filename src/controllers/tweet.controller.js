@@ -201,8 +201,8 @@ const getUserTweets = asyncHandler(async (req, res) => {
     skip: skip,
   });
   tweets = tweets.map((tweet) => {
-    tweet.isLiked = tweet.likes.find((like) => like.ownerId === req.user.id) !== undefined;
-    tweet.replies = tweet.comments.map((comment) => { comment.isLiked = comment.likes.find((like) => like.ownerId === req.user.id); return comment });
+    tweet.isLiked = tweet.likes?.find((like) => like.ownerId === req.user.id) !== undefined;
+    tweet.replies = tweet.comments.map((comment) => { comment.isLiked = comment.likes?.find((like) => like.ownerId === req.user.id); return comment });
     return tweet
   });
 
