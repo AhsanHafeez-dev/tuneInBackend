@@ -17,6 +17,9 @@ import { sendRegistrationEmail } from "../utils/Notification.js";
 // import { logger } from "../utils/logger.js";
 import jwt from "jsonwebtoken";
 
+
+
+
 const registerUser = asyncHandler(async (req, res) => {
   // logger.info(`request from ${req.ip}`);
 
@@ -49,32 +52,43 @@ const registerUser = asyncHandler(async (req, res) => {
 
   // logger.info("Registering ", email);
 
-  const avatarBuffer = req.files?.avatar[0]?.buffer;
-  let coverImageBuffer;
-  if (req.files?.coverImage) {
-    coverImageBuffer = req.files?.coverImage[0]?.buffer;
-  }
+  const { avatarUrl, avatarPublicId, coverImageUrl, coverImagePublicId } =
+    req.body;
 
-  if (!avatarBuffer) {
+  const avatarBuffer = req.files?.avatar ? req.files.avatar[0].buffer : null;
+  const coverImageBuffer = req.files?.coverImage
+    ? req.files.coverImage[0].buffer
+    : null;
+
+  if (!avatarBuffer && !avatarUrl) {
     throw new ApiError(
       httpCodes.badRequest,
-      "avatar is required for registration"
-    );
-  }
-  let avatar = await uploadOnCloudinary(avatarBuffer);
-  console.log(avatar);
-  
-  
-  if (!avatar) {
-    throw new ApiError(
-      httpCodes.serverSideError,
-      "cannot upload avatar image to cloudinary"
+      "avatar is required for registration (file or URL)"
     );
   }
 
-  let coverImage;
+  let finalAvatarUrl = avatarUrl;
+  let finalAvatarPublicId = avatarPublicId;
+  let finalCoverUrl = coverImageUrl || "";
+  let finalCoverPublicId = coverImagePublicId || "";
+
+  if (avatarBuffer) {
+    const avatar = await uploadOnCloudinary(avatarBuffer);
+    if (!avatar)
+      throw new ApiError(
+        httpCodes.serverSideError,
+        "cannot upload avatar image to cloudinary"
+      );
+    finalAvatarUrl = avatar.secure_url;
+    finalAvatarPublicId = avatar.public_id;
+  }
+
   if (coverImageBuffer) {
-    coverImage = await uploadOnCloudinary(coverImageBuffer);
+    const coverImage = await uploadOnCloudinary(coverImageBuffer);
+    if (coverImage) {
+      finalCoverUrl = coverImage.secure_url;
+      finalCoverPublicId = coverImage.public_id;
+    }
   }
 
   password = await encryptPassword(password);
@@ -85,10 +99,10 @@ const registerUser = asyncHandler(async (req, res) => {
       email,
       password,
       fullName,
-      coverImage: coverImage?.secure_url || "",
-      avatar: avatar.secure_url,
-      avatarPublicId: avatar.public_id,
-      coverImagePublicId: coverImage?.public_id || "",
+      coverImage: finalCoverUrl,
+      avatar: finalAvatarUrl,
+      avatarPublicId: finalAvatarPublicId,
+      coverImagePublicId: finalCoverPublicId,
     },
   });
 
@@ -113,6 +127,15 @@ const registerUser = asyncHandler(async (req, res) => {
       )
     );
 });
+
+
+
+
+
+
+
+
+
 
 const loginUser = asyncHandler(async (req, res) => {
   // logger.info("login user called");
