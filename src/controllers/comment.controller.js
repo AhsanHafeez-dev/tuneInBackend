@@ -24,8 +24,8 @@ const getVideoComments = asyncHandler(async (req, res) => {
   
   comments = comments.map((comment) => {
     
-    comment.isLiked = comment.likes.find((like) => like.ownerId === req.user.id);
-    comment.replies =comment.replies.map((comment) => { comment.isLiked = comment.likes.find((like) => like.ownerId === req.user.id); return comment });
+    comment.isLiked = comment.likes?.find((like) => like.ownerId === req.user.id);
+    comment.replies =comment.replies.map((comment) => { comment.isLiked = comment.likes?.find((like) => like.ownerId === req.user.id); return comment });
     return comment;
   })
   return res
