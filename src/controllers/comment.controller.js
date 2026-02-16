@@ -102,7 +102,7 @@ const deleteComment = asyncHandler(async (req, res) => {
 });
 
 const getTweetComments = asyncHandler(async (req, res) => {
-  const { tweetId } = req.paarams;
+  const { tweetId } = req.params;
   if (!tweetId) {
     throw new ApiError(httpCodes.badRequest, "tweetId is required");
   }
