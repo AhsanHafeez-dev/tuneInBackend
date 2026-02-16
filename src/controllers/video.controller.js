@@ -124,7 +124,7 @@ const getVideoById = asyncHandler(async (req, res) => {
 
   let video;
   const previouslyWatched = await prisma.watchHistory.findFirst({
-    where: { videoId },
+    where: { videoId,viewerId:req.user?.id },
     include: {
       video: {
         include: {
