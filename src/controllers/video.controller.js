@@ -21,7 +21,8 @@ const searchQuery = asyncHandler(async (req, res) => {
         { title: { contains: query,mode:"insensitive" } }
         
       ]
-    }
+    },
+    include:{owner:true}
   });
   return res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok,videos,"suggestion fetched"))
 
