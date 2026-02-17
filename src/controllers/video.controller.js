@@ -428,6 +428,14 @@ const getUploadSignature = asyncHandler(async (req, res) => {
 });
 
 
+const updateUserDetails = asyncHandler(async (req, res) => {
+  const { fullName, email } = req.body;
+
+  if (!(fullName && email)) { throw new ApiError(httpCodes.badRequest, "fullName and email both are required"); }
+
+  const user = await prisma.user.update({ where: { id: req.user.id }, data: { fullName, email } });
+  return res.status(httpCodes.ok).json(new ApiResponse(httpCodes.ok, user, "user updated successfully"));
+})
 
 export {
   getAllVideos,
@@ -440,5 +448,6 @@ export {
   getVideoSuggestions,
   searchQuery,
   getUploadSignature,
+  updateUserDetails
 
 };
