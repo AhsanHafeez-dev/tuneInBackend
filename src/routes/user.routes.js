@@ -40,6 +40,6 @@ router.route("/history").get(verifyJWT, getWatchHistory).post(verifyJWT, addVide
 
 router.route("/current-user").get(verifyJWT, getCurrentUser);
 router.route("/signature").get(getUploadSignature);
-router.route("/update-account").patch(updateUserDetails)
+router.route("/update-account").patch(verifyJWT,updateUserDetails)
 
 export default router;
